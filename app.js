@@ -1,11 +1,13 @@
+import config from "./config.js";
+
 // API Information
-const apiKey = 'your_openweather_api_key'; // Replace this with your actual OpenWeather API key
+const apiKey = `${config.apiKey}`; // Replace this with your actual OpenWeather API key
 const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
 // DOM Elements
 const weatherForm = document.getElementById('weather-form');
 const cityInput = document.getElementById('city-input');
-const weatherInfo = document.getElementById('weather-info');
+const weatherResult = document.getElementById('weather-result');
 const cityName = document.getElementById('city-name');
 const temperature = document.getElementById('temperature');
 const description = document.getElementById('description');
@@ -16,9 +18,10 @@ const errorMessage = document.getElementById('error-message');
 // Event Listener
 weatherForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const city = cityInput.value;
-    getWeather(city);
-    cityInput.value = '';  // Clear input after submission
+    const city = cityInput.value.trim();
+    if (city) {
+        getWeather(city);
+    } 
 });
 
 // Fetch Weather Data
@@ -33,11 +36,10 @@ async function getWeather(city) {
 
         const data = await response.json();
         displayWeather(data);
-        errorMessage.classList.add('hidden');
+        errorMessage.classList.add('d-none');
     } catch (error) {
-        errorMessage.textContent = error.message;
-        errorMessage.classList.remove('hidden');
-        weatherInfo.classList.add('hidden');
+        // Display error message
+        showErrorMessage(`${error.message}`);
     }
 }
 
@@ -49,5 +51,12 @@ function displayWeather(data) {
     humidity.textContent = `Humidity: ${data.main.humidity}%`;
     windSpeed.textContent = `Wind Speed: ${data.wind.speed} m/s`;
 
-    weatherInfo.classList.remove('hidden');
+    weatherResult.classList.remove('d-none');
+    cityInput.value = '';  // Clear input after submission
+}
+
+function showErrorMessage(message) {
+    weatherResult.classList.add('d-none');
+    errorMessage.classList.remove('d-none');
+    errorMessage.textContent = message;
 }
